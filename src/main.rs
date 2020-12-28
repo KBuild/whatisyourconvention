@@ -17,17 +17,11 @@ enum MyCase {
 fn case_finder(str: Option<&str>) -> MyCase {
     match str {
         Some(inner_data) => {
-            
+            if !inner_data.is_ascii() {
+                return MyCase::Others
+            }
+
             if inner_data.contains("-") || inner_data.contains("_") {
-                let camel_case: String = heck::CamelCase::to_camel_case(inner_data);
-
-                if camel_case.eq(inner_data) {
-                    return MyCase::Camel
-                }
-                else if (camel_case[..1].to_ascii_uppercase() + &camel_case[1..]).eq(inner_data) {
-                    return  MyCase::Pascal
-                }
-
                 if heck::KebabCase::to_kebab_case(inner_data).eq(inner_data) {
                     return MyCase::Kebab
                 }
@@ -37,14 +31,24 @@ fn case_finder(str: Option<&str>) -> MyCase {
                 }
 
                 return MyCase::Mixed
-            } else {
-                if inner_data.to_ascii_uppercase().eq(inner_data) {
-                    return MyCase::Upper
-                }
+            }
 
-                if inner_data.to_ascii_lowercase().eq(inner_data) {
-                    return MyCase::Lower
-                }
+            if inner_data.to_ascii_uppercase().eq(inner_data) {
+                return MyCase::Upper
+            }
+ 
+            if inner_data.to_ascii_lowercase().eq(inner_data) {
+                return MyCase::Lower
+            }
+
+            let capitalized: String = heck::CamelCase::to_camel_case(inner_data);
+
+            if capitalized.eq(inner_data) {
+                return MyCase::Pascal
+            }
+            
+            if (capitalized[..1].to_ascii_lowercase() + &capitalized[1..]).eq(inner_data) {
+                return  MyCase::Camel
             }
 
             return MyCase::Others
